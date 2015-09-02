@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import matplotlib.pyplot as plt
+import numpy as np
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+
+def L(mean, var, sample):
+    n = len(sample)
+    return -n/2. * np.log2(2 * np.pi) - \
+            n/2. * np.log2(2 * var) - \
+            1/(2 * var) * np.sum((sample - mean)**2)
+
+mean = 5
+var = 3
+n = 100
+sample = np.random.normal(loc=mean,
+                          scale=np.sqrt(var),
+                          size=n)
+
+print('mean: {}\nvariance: {}'.format(mean, var))
+
+means = np.linspace(1, 10, 25)
+variances = np.linspace(1, 5, 25)
+X, Y = np.meshgrid(means, variances)
+Z = np.zeros(X.shape)
+for i in xrange(25):
+    for j in xrange(i, 25):
+        Z[i, j] = L(X[i,j], Y[i,j], sample)
+        Z[j, i] = Z[i, j]
+
+surf = ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.coolwarm,
+        linewidth=0, antialiased=False)
+
+fig.colorbar(surf, shrink=0.5, aspect=5)
+
+plt.show()
